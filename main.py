@@ -1,38 +1,26 @@
 import argparse
-import math
-from pathlib import Path
-import sys
-from typing import Callable
-import xmlrpc.client
+from dataclasses import dataclass
+import time
 
-Vector = list[float]
-Objective = Callable[[Vector], float]
+from common_types import Case, Objective
+from random_search import random_search
+from server_handler import check_server, make_server_objective
+    
+def run_cases(objective: Objective, cases: list[Case]) -> None:
+    for case in cases:
+        print("\n" + "=" * 72)
+        print(f"Running case: {case.name}")
+        print(f"method={case.method}, budget={case.budget}, seed={case.seed}")
+        start = time.perf_counter()
 
-BAD_VALUE = 1_000_000.0
+        if case.method == "random":
+            best_candidate, best_value, history = random_search(objective, case)
+        else:
+            raise ValueError(f"Unknown method: {case.method}")
 
-def make_server_objective(address: str, port: int) -> Objective:
-    client = xmlrpc.client.ServerProxy(f"http://{address}:{port}", allow_none=True)
+        elapsed = time.perf_counter() - start
+        print(f"DONE: best J(x) = {best_value:.12g}, x = {best_candidate}, time = {elapsed:.2f}s")
 
-    def objective(candidate: Vector) -> float:
-        return float(client.evaluate([float(v) for v in candidate]))
-
-    return objective
-
-def check_server(objective: Objective) -> None:
-    print("Checking server connection. Evaluationg example vectors:")
-    for candidate in ([1.0, 2.0, 3.0, 4.0], [0.0, 0.0, 0.0, 0.0], [-4.0, -4.0, -4.0, 4.0]):
-        value = safe_evaluate(objective, list(candidate))
-        print(f"  J({list(candidate)}) = {value}")
-
-def safe_evaluate(objective: Objective, candidate: Vector) -> float:
-    try:
-        value = float(objective(candidate))
-        if not math.isfinite(value):
-            return BAD_VALUE
-        return value
-    except Exception as error:
-        print(f"  evaluation failed for {candidate}: {error}")
-        return BAD_VALUE
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Beta runner for WAE VSI experiments through the MATLAB XML-RPC server.")
@@ -41,14 +29,16 @@ def main() -> None:
     parser.add_argument("--check", action="store_true", help="Only check a few objective values and exit.")
     args = parser.parse_args()
 
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
+    # if len(sys.argv) == 1:
+    #     parser.print_help(sys.stderr)
+    #     sys.exit(1)
 
     objective = make_server_objective(args.address, args.port)
     if args.check:
         check_server(objective)
         return
+    
+    run_cases(objective, [Case("test", "random", 10, 10)])
 
 if __name__ == "__main__":
     main()
