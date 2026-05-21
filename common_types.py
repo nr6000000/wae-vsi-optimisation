@@ -11,6 +11,9 @@ class Case:
     method: str
     budget: int
     seed: int
+    population: int = 10
+    mutation_sigma: float = 0.7
+    crossover: str = "arithmetic"
 
 BAD_VALUE = 1_000_000.0
 LOWER_BOUND = -4.0

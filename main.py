@@ -9,6 +9,7 @@ import time
 import matplotlib.pyplot as plt
 
 from common_types import Case, Objective
+from genetic_algorithm import genetic_algorithm
 from random_search import random_search
 from server_handler import check_server, make_server_objective
     
@@ -96,6 +97,8 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
 
         if case.method == "random":
             best_candidate, best_value, history = random_search(objective, case)
+        elif case.method == "ga":
+            best_candidate, best_value, history = genetic_algorithm(objective, case)
         else:
             raise ValueError(f"Unknown method: {case.method}")
 
@@ -107,6 +110,9 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
             "method": case.method,
             "budget": case.budget,
             "seed": case.seed,
+            "population": case.population,
+            "mutation_sigma": case.mutation_sigma,
+            "crossover": case.crossover,
             "best_value": best_value,
             "elapsed_sec": elapsed,
         }
@@ -154,6 +160,9 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
 def parse_int(text: str, default: int) -> int:
     return int(text) if text.strip() else default
 
+def parse_float(text: str, default: float) -> float:
+    return float(text) if text.strip() else default
+
 def read_cases(path: Path) -> list[Case]:
     cases: list[Case] = []
     with path.open(newline="", encoding="utf-8") as handle:
@@ -165,6 +174,9 @@ def read_cases(path: Path) -> list[Case]:
                     method=row["method"].strip().lower(),
                     budget=parse_int(row.get("budget", ""), 40),
                     seed=parse_int(row.get("seed", ""), 316018),
+                    population=parse_int(row.get("population", ""), 10),
+                    mutation_sigma=parse_float(row.get("mutation_sigma", ""), 0.7),
+                    crossover=(row.get("crossover", "") or "arithmetic").strip(),
                 )
             )
     return cases

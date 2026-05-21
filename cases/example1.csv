@@ -1,3 +1,5 @@
-case,method,budget,seed
-random_seed1,random,10,316018
-random_seed2,random,10,348556
+case,method,budget,seed,population,mutation_sigma,crossover
+random_seed1,random,10,316018,,,
+random_seed2,random,10,348556,,,
+genetic_seed1,ga,10,316018,10,0.7,arithmetic
+genetic_seed2,ga,10,348556,10,0.7,arithmetic
