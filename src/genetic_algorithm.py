@@ -1,15 +1,13 @@
 import random
-from common_types import DIMENSION, LOWER_BOUND, UPPER_BOUND, Case, Objective, Vector
+from common_types import DIMENSION, Case, Objective, Vector
 from random_search import random_vector
 from server_handler import safe_evaluate
+from misc import clip
 
 
 def tournament(population: list[tuple[Vector, float]], rng: random.Random, size: int = 3) -> Vector:
     selected = rng.sample(population, min(size, len(population)))
     return min(selected, key=lambda item: item[1])[0]
-
-def clip(value: float) -> float:
-    return min(max(value, LOWER_BOUND), UPPER_BOUND)
 
 def make_child(parent_a: Vector, parent_b: Vector, rng: random.Random, case: Case) -> Vector:
     child: Vector = []

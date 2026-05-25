@@ -12,6 +12,7 @@ from common_types import Case, Objective
 from genetic_algorithm import genetic_algorithm
 from random_search import random_search
 from server_handler import check_server, make_server_objective
+from differential_evolution import differential_evolution
     
 def make_summary(run_rows: list[dict[str, object]]) -> list[dict[str, object]]:
     groups: dict[str, list[dict[str, object]]] = {}
@@ -99,6 +100,8 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
             best_candidate, best_value, history = random_search(objective, case)
         elif case.method == "ga":
             best_candidate, best_value, history = genetic_algorithm(objective, case)
+        elif case.method in {"de", "de_rand_1_bin"}:
+            best_candidate, best_value, history = differential_evolution(objective, case)
         else:
             raise ValueError(f"Unknown method: {case.method}")
 
@@ -113,6 +116,8 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
             "population": case.population,
             "mutation_sigma": case.mutation_sigma,
             "crossover": case.crossover,
+            "differential_weight": case.differential_weight,
+            "crossover_rate": case.crossover_rate,
             "best_value": best_value,
             "elapsed_sec": elapsed,
         }
@@ -177,6 +182,8 @@ def read_cases(path: Path) -> list[Case]:
                     population=parse_int(row.get("population", ""), 10),
                     mutation_sigma=parse_float(row.get("mutation_sigma", ""), 0.7),
                     crossover=(row.get("crossover", "") or "arithmetic").strip(),
+                    differential_weight=parse_float(row.get("differential_weight", ""), 0.7),
+                    crossover_rate=parse_float(row.get("crossover_rate", ""), 0.9),
                 )
             )
     return cases

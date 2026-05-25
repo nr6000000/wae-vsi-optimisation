@@ -1,5 +1,7 @@
-case,method,budget,seed,population,mutation_sigma,crossover
-random_seed1,random,10,316018,,,
-random_seed2,random,10,348556,,,
-genetic_seed1,ga,10,316018,10,0.7,arithmetic
-genetic_seed2,ga,10,348556,10,0.7,arithmetic
+case,method,budget,seed,population,mutation_sigma,crossover,differential_weight,crossover_rate
+random_seed1,random,10,316018,,,,,
+random_seed2,random,10,348556,,,,,
+genetic_seed1,ga,10,316018,10,0.7,arithmetic,,
+genetic_seed2,ga,10,348556,10,0.7,arithmetic,,
+differential_seed1,de,10,316018,10,,,0.7,0.9
+differential_seed2,de,10,348556,10,,,0.7,0.9
