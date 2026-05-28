@@ -1,0 +1,7 @@
+case,method,budget,seed,population,mutation_sigma,crossover,differential_weight,crossover_rate
+random_demo_seed1,random,60,316018,,,,,
+random_demo_seed2,random,60,348556,,,,,
+ga_demo_seed1,ga,60,316018,10,0.7,arithmetic,,
+ga_demo_seed2,ga,60,348556,10,0.7,arithmetic,,
+de_demo_seed1,de,60,316018,10,,,0.7,0.9
+de_demo_seed2,de,60,348556,10,,,0.7,0.9

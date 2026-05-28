@@ -197,7 +197,6 @@ def main() -> None:
     parser.add_argument("--cases", type=Path, default=Path("cases_tiny.csv"))
     parser.add_argument("--out", type=Path, default=Path("results/tiny"))
     parser.add_argument("--min", action='store_true')
-    parser.add_argument("--max", action='store_true')
 
     args = parser.parse_args()
 
@@ -214,11 +213,8 @@ def main() -> None:
 
     if args.min:
         run_cases(objective, min, cases, args.out)
-
-    if args.max:
+    else:
         run_cases(objective, max, cases, args.out)
-
-    run_cases(objective, max, cases, args.out)
 
 if __name__ == "__main__":
     main()
