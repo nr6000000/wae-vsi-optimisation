@@ -86,7 +86,7 @@ def iqr(values: list[float]) -> float:
     q = statistics.quantiles(values, n=4, method="inclusive")
     return q[2] - q[0]
 
-def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
+def run_cases(objective: Objective, comparator, cases: list[Case], out_dir: Path) -> None:
     run_rows: list[dict[str, object]] = []
     history_rows: list[dict[str, object]] = []
     
@@ -97,11 +97,11 @@ def run_cases(objective: Objective, cases: list[Case], out_dir: Path) -> None:
         start = time.perf_counter()
 
         if case.method == "random":
-            best_candidate, best_value, history = random_search(objective, case)
+            best_candidate, best_value, history = random_search(objective, comparator, case)
         elif case.method == "ga":
-            best_candidate, best_value, history = genetic_algorithm(objective, case)
+            best_candidate, best_value, history = genetic_algorithm(objective, comparator, case)
         elif case.method in {"de", "de_rand_1_bin"}:
-            best_candidate, best_value, history = differential_evolution(objective, case)
+            best_candidate, best_value, history = differential_evolution(objective, comparator, case)
         else:
             raise ValueError(f"Unknown method: {case.method}")
 
@@ -196,6 +196,8 @@ def main() -> None:
     parser.add_argument("--check", action="store_true", help="Only check a few objective values and exit.")
     parser.add_argument("--cases", type=Path, default=Path("cases_tiny.csv"))
     parser.add_argument("--out", type=Path, default=Path("results/tiny"))
+    parser.add_argument("--min", action='store_true')
+    parser.add_argument("--max", action='store_true')
 
     args = parser.parse_args()
 
@@ -209,7 +211,14 @@ def main() -> None:
         return
     
     cases = read_cases(args.cases)
-    run_cases(objective, cases, args.out)
+
+    if args.min:
+        run_cases(objective, min, cases, args.out)
+
+    if args.max:
+        run_cases(objective, max, cases, args.out)
+
+    run_cases(objective, max, cases, args.out)
 
 if __name__ == "__main__":
     main()

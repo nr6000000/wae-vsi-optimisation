@@ -5,9 +5,9 @@ from server_handler import safe_evaluate
 from misc import clip
 
 
-def tournament(population: list[tuple[Vector, float]], rng: random.Random, size: int = 3) -> Vector:
+def tournament(population: list[tuple[Vector, float]], comparator, rng: random.Random, size: int = 3) -> Vector:
     selected = rng.sample(population, min(size, len(population)))
-    return min(selected, key=lambda item: item[1])[0]
+    return comparator(selected, key=lambda item: item[1])[0]
 
 def make_child(parent_a: Vector, parent_b: Vector, rng: random.Random, case: Case) -> Vector:
     child: Vector = []
@@ -29,7 +29,7 @@ def make_child(parent_a: Vector, parent_b: Vector, rng: random.Random, case: Cas
             child[i] = clip(child[i] + rng.gauss(0.0, case.mutation_sigma))
     return child
 
-def genetic_algorithm(objective: Objective, case: Case) -> tuple[Vector, float, list[tuple[int, float]]]:
+def genetic_algorithm(objective: Objective, comparator, case: Case) -> tuple[Vector, float, list[tuple[int, float]]]:
     rng = random.Random(case.seed)
     population_size = max(4, case.population)
     population: list[tuple[Vector, float]] = []
@@ -41,7 +41,7 @@ def genetic_algorithm(objective: Objective, case: Case) -> tuple[Vector, float, 
         value = safe_evaluate(objective, candidate)
         population.append((candidate, value))
         evaluations += 1
-        history.append((evaluations, min(value for _, value in population)))
+        history.append((evaluations, comparator(value for _, value in population)))
         print(f"  init {evaluations:4d}/{case.budget}: current={value:.8g}, best={history[-1][1]:.8g}")
 
     while evaluations < case.budget:
@@ -49,17 +49,17 @@ def genetic_algorithm(objective: Objective, case: Case) -> tuple[Vector, float, 
         next_population = population[:2]  # a tiny bit of elitism
 
         while len(next_population) < population_size and evaluations < case.budget:
-            parent_a = tournament(population, rng)
-            parent_b = tournament(population, rng)
+            parent_a = tournament(population, comparator, rng)
+            parent_b = tournament(population, comparator, rng)
             child = make_child(parent_a, parent_b, rng, case)
             value = safe_evaluate(objective, child)
             next_population.append((child, value))
             evaluations += 1
-            best_value = min(value for _, value in next_population + population[:2])
+            best_value = comparator(value for _, value in next_population + population[:2])
             history.append((evaluations, best_value))
             print(f"  eval {evaluations:4d}/{case.budget}: current={value:.8g}, best={best_value:.8g}")
 
         population = next_population
 
-    best_candidate, best_value = min(population, key=lambda item: item[1])
+    best_candidate, best_value = comparator(population, key=lambda item: item[1])
     return best_candidate, best_value, history

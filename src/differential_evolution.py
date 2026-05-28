@@ -4,7 +4,7 @@ from misc import clip, random_vector
 from server_handler import safe_evaluate
 
 
-def differential_evolution(objective: Objective, case: Case) -> tuple[Vector, float, list[tuple[int, float]]]:
+def differential_evolution(objective: Objective, comparator, case: Case) -> tuple[Vector, float, list[tuple[int, float]]]:
     rng = random.Random(case.seed)
     population_size = max(4, case.population)
     population: list[Vector] = []
@@ -18,7 +18,7 @@ def differential_evolution(objective: Objective, case: Case) -> tuple[Vector, fl
         population.append(candidate)
         values.append(value)
         evaluations += 1
-        history.append((evaluations, min(values)))
+        history.append((evaluations, comparator(values)))
         print(f"  init {evaluations:4d}/{case.budget}: current={value:.8g}, best={history[-1][1]:.8g}")
 
     while evaluations < case.budget:
@@ -43,12 +43,12 @@ def differential_evolution(objective: Objective, case: Case) -> tuple[Vector, fl
 
             trial_value = safe_evaluate(objective, trial)
             evaluations += 1
-            if trial_value <= values[target_index]:
+            if comparator(trial_value, values[target_index]) == trial_value:
                 population[target_index] = trial
                 values[target_index] = trial_value
 
-            history.append((evaluations, min(values)))
+            history.append((evaluations, comparator(values)))
             print(f"  eval {evaluations:4d}/{case.budget}: current={trial_value:.8g}, best={history[-1][1]:.8g}")
 
-    best_index = min(range(population_size), key=lambda i: values[i])
+    best_index = comparator(range(population_size), key=lambda i: values[i])
     return population[best_index], values[best_index], history
