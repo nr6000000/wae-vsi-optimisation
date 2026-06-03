@@ -1,0 +1,4 @@
+case,method,budget,seed,population,mutation_sigma,crossover,differential_weight,crossover_rate
+random_smoke,random,10,316018,,,,,
+ga_smoke,ga,10,316018,6,0.5,arithmetic,,
+de_smoke,de,10,316018,6,,,0.7,0.9
