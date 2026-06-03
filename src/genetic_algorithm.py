@@ -1,8 +1,7 @@
 import random
 from common_types import DIMENSION, Case, Objective, Vector
-from random_search import random_vector
+from misc import clip, random_vector
 from server_handler import safe_evaluate
-from misc import clip
 
 
 def tournament(population: list[tuple[Vector, float]], comparator, rng: random.Random, size: int = 3) -> Vector:
@@ -45,7 +44,7 @@ def genetic_algorithm(objective: Objective, comparator, case: Case) -> tuple[Vec
         print(f"  init {evaluations:4d}/{case.budget}: current={value:.8g}, best={history[-1][1]:.8g}")
 
     while evaluations < case.budget:
-        population.sort(key=lambda item: item[1])
+        population.sort(key=lambda item: item[1], reverse=(comparator is max))
         next_population = population[:2]  # a tiny bit of elitism
 
         while len(next_population) < population_size and evaluations < case.budget:

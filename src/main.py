@@ -196,7 +196,7 @@ def main() -> None:
     parser.add_argument("--check", action="store_true", help="Only check a few objective values and exit.")
     parser.add_argument("--cases", type=Path, default=Path("cases_tiny.csv"))
     parser.add_argument("--out", type=Path, default=Path("results/tiny"))
-    parser.add_argument("--min", action='store_true')
+    parser.add_argument("--max", action="store_true", help="Maximize objective instead of minimizing it.")
 
     args = parser.parse_args()
 
@@ -211,10 +211,8 @@ def main() -> None:
     
     cases = read_cases(args.cases)
 
-    if args.min:
-        run_cases(objective, min, cases, args.out)
-    else:
-        run_cases(objective, max, cases, args.out)
+    comparator = max if args.max else min
+    run_cases(objective, comparator, cases, args.out)
 
 if __name__ == "__main__":
     main()
