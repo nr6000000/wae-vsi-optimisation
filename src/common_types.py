@@ -18,6 +18,6 @@ class Case:
     crossover_rate: float = 0.9
 
 BAD_VALUE = 1_000_000.0
-LOWER_BOUND = -4.0
-UPPER_BOUND = 4.0
+LOWER_BOUND = -10.0
+UPPER_BOUND = 10.0
 DIMENSION = 4

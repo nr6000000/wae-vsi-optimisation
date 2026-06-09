@@ -7,6 +7,7 @@ import statistics
 import sys
 import time
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 from common_types import Case, Objective
 from genetic_algorithm import genetic_algorithm
@@ -90,7 +91,7 @@ def run_cases(objective: Objective, comparator, cases: list[Case], out_dir: Path
     run_rows: list[dict[str, object]] = []
     history_rows: list[dict[str, object]] = []
     
-    for case in cases:
+    for case in tqdm(cases):
         print("\n" + "=" * 72)
         print(f"Running case: {case.name}")
         print(f"method={case.method}, budget={case.budget}, seed={case.seed}")
@@ -209,6 +210,9 @@ def main() -> None:
         check_server(objective)
         return
     
+    print(objective([-8.645959, -8.882111, -1.197768, 8.363739]))
+    sys.exit()
+
     cases = read_cases(args.cases)
 
     comparator = max if args.max else min
