@@ -31,4 +31,4 @@ Generowanie wykresów:
 uv run src/create_plots.py --out <folder na wyniki>
 ```
 
-Dane zamieszczone w raporcie pochodzą z uruchomienia na `cases_full.csv`.
+Dane zamieszczone w raporcie pochodzą z uruchomienia na `cases_full.csv`. Dane z tego uruchomienie są w folderze `out`.
