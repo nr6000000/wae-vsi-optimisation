@@ -18,4 +18,5 @@ dependencies = [
     "six>=1.17.0",
     "pandas>=3.0.3",
     "seaborn>=0.13.2",
+    "tqdm>=4.68.2",
 ]
